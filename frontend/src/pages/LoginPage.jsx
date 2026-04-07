@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, Link } from "react-router-dom"
 
 function LoginPage() {
   const [email, setEmail] = useState("")
@@ -9,8 +9,7 @@ function LoginPage() {
   const navigate = useNavigate()
 
   const handleLogin = async () => {
-    // Basic validation
-    if (!email || !password) {
+    if (!email.trim() || !password.trim()) {
       setError("Please fill in all fields")
       return
     }
@@ -32,100 +31,119 @@ function LoginPage() {
         return
       }
 
-      // Save the token the backend sends back
       localStorage.setItem("token", data.token)
-
-      // Go to jobs page after login
       navigate("/jobs")
-
-    } catch (err) {
-      setError("Backend Not Running")
+    } catch {
+      setError("Something went wrong. Is the backend running?")
     } finally {
       setLoading(false)
     }
   }
 
-  // Allow pressing Enter to submit
   const handleKeyDown = (e) => {
     if (e.key === "Enter") handleLogin()
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 w-full max-w-md p-8">
+    <div className="auth-page">
+      <div className="auth-bg-circle auth-bg-circle-top" />
+      <div className="auth-bg-circle auth-bg-circle-bottom" />
 
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-2xl font-semibold text-gray-900">Welcome back</h1>
-          <p className="text-gray-500 text-sm mt-1">
-            Log in to find your next opportunity
-          </p>
+      <div className="auth-card glass-strong">
+        <div className="auth-brand">
+          <div className="auth-brand-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <path
+                d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"
+                stroke="white"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </div>
+          <span className="auth-brand-text">RefIn</span>
         </div>
 
-        {/* Form */}
-        <div className="flex flex-col gap-4">
+        <div className="auth-header">
+          <h1 className="auth-title">Welcome back</h1>
+          <p className="auth-subtitle">Log in to find your next opportunity</p>
+        </div>
 
-          {/* Email field */}
-          <div className="flex flex-col gap-1">
-            <label className="text-sm font-medium text-gray-700">
-              Email
-            </label>
+        <div className="auth-form">
+          <div className="form-group">
+            <label className="form-label">Email</label>
             <input
               type="email"
               placeholder="you@email.com"
               value={email}
-              onChange={e => setEmail(e.target.value)}
+              onChange={(e) => setEmail(e.target.value)}
               onKeyDown={handleKeyDown}
-              className="border border-gray-300 rounded-lg px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+              className="glass-input auth-input"
             />
           </div>
 
-          {/* Password field */}
-          <div className="flex flex-col gap-1">
-            <label className="text-sm font-medium text-gray-700">
-              Password
-            </label>
+          <div className="form-group">
+            <label className="form-label">Password</label>
             <input
               type="password"
               placeholder="Your password"
               value={password}
-              onChange={e => setPassword(e.target.value)}
+              onChange={(e) => setPassword(e.target.value)}
               onKeyDown={handleKeyDown}
-              className="border border-gray-300 rounded-lg px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+              className="glass-input auth-input"
             />
           </div>
 
-          {/* Error message */}
-          {error && (
-            <p className="text-red-500 text-sm bg-red-50 border border-red-200 rounded-lg px-4 py-2">
-              {error}
-            </p>
-          )}
+          {error && <div className="auth-error">{error}</div>}
 
-          {/* Submit button */}
           <button
             onClick={handleLogin}
             disabled={loading}
-            className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium py-2.5 rounded-lg text-sm transition cursor-pointer mt-1"
+            className="btn-primary auth-button"
           >
             {loading ? "Logging in..." : "Log in"}
           </button>
 
-          {/* Divider */}
-          <div className="flex items-center gap-3 my-1">
-            <div className="flex-1 h-px bg-gray-200"></div>
-            <span className="text-xs text-gray-400">or</span>
-            <div className="flex-1 h-px bg-gray-200"></div>
+          <div className="auth-divider">
+            <div className="auth-divider-line" />
+            <span className="auth-divider-text">or</span>
+            <div className="auth-divider-line" />
           </div>
 
-          {/* Signup link */}
-          <p className="text-center text-sm text-gray-500">
-            Don't have an account?{" "}
-            <a href="/signup" className="text-blue-600 hover:underline font-medium">
-              Sign up
-            </a>
-          </p>
+          <button
+            onClick={() => {
+              window.location.href = "http://localhost:8000/auth/google"
+            }}
+            className="glass auth-social-button"
+          >
+            <svg width="18" height="18" viewBox="0 0 48 48">
+              <path
+                fill="#EA4335"
+                d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"
+              />
+              <path
+                fill="#4285F4"
+                d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"
+              />
+              <path
+                fill="#FBBC05"
+                d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"
+              />
+              <path
+                fill="#34A853"
+                d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"
+              />
+            </svg>
+            Continue with Google
+          </button>
 
+          <p className="auth-footer-text">
+            Don't have an account?{" "}
+            <Link to="/signup" className="auth-link">
+              Sign up
+            </Link>
+          </p>
         </div>
       </div>
     </div>
