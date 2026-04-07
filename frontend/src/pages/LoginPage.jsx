@@ -1,5 +1,7 @@
 import { useState } from "react"
 import { useNavigate, Link } from "react-router-dom"
+import { setToken } from "../utils/auth"
+import Navbar from "../components/Navbar"
 
 function LoginPage() {
   const [email, setEmail] = useState("")
@@ -31,7 +33,7 @@ function LoginPage() {
         return
       }
 
-      localStorage.setItem("token", data.token)
+      setToken(data.token)
       navigate("/jobs")
     } catch {
       setError("Something went wrong. Is the backend running?")
@@ -45,6 +47,8 @@ function LoginPage() {
   }
 
   return (
+    <>
+    <Navbar/>
     <div className="auth-page">
       <div className="auth-bg-circle auth-bg-circle-top" />
       <div className="auth-bg-circle auth-bg-circle-bottom" />
@@ -75,7 +79,7 @@ function LoginPage() {
             <label className="form-label">Email</label>
             <input
               type="email"
-              placeholder="you@email.com"
+              placeholder="your@email.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               onKeyDown={handleKeyDown}
@@ -147,6 +151,7 @@ function LoginPage() {
         </div>
       </div>
     </div>
+    </>
   )
 }
 

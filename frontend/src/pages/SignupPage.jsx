@@ -1,5 +1,7 @@
 import { useState } from "react"
 import { useNavigate, Link } from "react-router-dom"
+import { setToken } from "../utils/auth"
+import Navbar from "../components/Navbar"
 
 function SignupPage() {
   const [fullName, setFullName] = useState("")
@@ -44,7 +46,7 @@ function SignupPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          name: fullName,
+          full_name: fullName,
           email,
           password,
         }),
@@ -57,7 +59,7 @@ function SignupPage() {
         return
       }
 
-      localStorage.setItem("token", data.token)
+      setToken(data.token)
       navigate("/jobs")
     } catch {
       setError("Something went wrong. Is the backend running?")
@@ -71,6 +73,8 @@ function SignupPage() {
   }
 
   return (
+    <>
+    <Navbar/>
     <div className="auth-page">
       <div className="auth-bg-circle auth-bg-circle-top" />
       <div className="auth-bg-circle auth-bg-circle-bottom" />
@@ -144,7 +148,7 @@ function SignupPage() {
             <label className="form-label">Email</label>
             <input
               type="email"
-              placeholder="you@email.com"
+              placeholder="your@email.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               onKeyDown={handleKeyDown}
@@ -195,6 +199,7 @@ function SignupPage() {
         </div>
       </div>
     </div>
+    </>
   )
 }
 
