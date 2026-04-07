@@ -39,7 +39,7 @@ function LoginPage() {
       navigate("/jobs")
 
     } catch (err) {
-      setError("Something went wrong. Is the backend running?")
+      setError("Backend Not Running")
     } finally {
       setLoading(false)
     }
