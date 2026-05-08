@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom"
 import Navbar from "../components/Navbar"
 
 function JobsPage() {
@@ -14,6 +15,7 @@ function JobsPage() {
         "Build clean React interfaces, improve user experience, and collaborate with the team on modern frontend features.",
       skills: ["React", "JavaScript", "UI/UX"],
     },
+
     {
       id: 2,
       title: "Junior Backend Developer",
@@ -26,6 +28,7 @@ function JobsPage() {
         "Develop APIs, work with databases, and support backend features using modern server-side technologies.",
       skills: ["FastAPI", "PostgreSQL", "Python"],
     },
+
     {
       id: 3,
       title: "UI/UX Designer",
@@ -59,35 +62,6 @@ function JobsPage() {
               designed to help candidates grow their skills and connect with
               employers.
             </p>
-
-            <div className="jobs-search-card glass">
-              <input
-                type="text"
-                placeholder="Search by job title, company, or skill..."
-                className="jobs-search-input"
-              />
-
-              <button className="btn-primary jobs-search-button">
-                Search Jobs
-              </button>
-            </div>
-          </section>
-
-          <section className="jobs-stats-grid">
-            <div className="jobs-stat-card glass-strong">
-              <span>{jobs.length}</span>
-              <p>Open Jobs</p>
-            </div>
-
-            <div className="jobs-stat-card glass-strong">
-              <span>2</span>
-              <p>Remote Options</p>
-            </div>
-
-            <div className="jobs-stat-card glass-strong">
-              <span>3</span>
-              <p>Hiring Companies</p>
-            </div>
           </section>
 
           <section className="jobs-list">
@@ -139,9 +113,12 @@ function JobsPage() {
                     Apply Now
                   </button>
 
-                  <button className="glass jobs-details-button">
+                  <Link
+                    to={`/jobs/${job.id}`}
+                    className="glass jobs-details-button"
+                  >
                     View Details
-                  </button>
+                  </Link>
                 </div>
               </article>
             ))}
