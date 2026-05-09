@@ -11,6 +11,8 @@ import ForgotPasswordPage from "./pages/ForgotPasswordPage"
 import ResetPasswordPage from "./pages/ResetPasswordPage"
 
 
+import ApplicationsPage from "./pages/ApplicationsPage"
+
 function App() {
   return (
     <Router>
@@ -22,6 +24,7 @@ function App() {
 
         <Route path="/jobs/:jobId" element={<JobDetailsPage />} />
 
+        <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
 
         <Route path="/signup" element={<SignupPage />} />
@@ -34,6 +37,7 @@ function App() {
 
         {/* Protected Routes */}
         {/* Dashboard page here */}
+        <Route path="/applications" element={<ApplicationsPage />} />
       </Routes>
     </Router>
   )
