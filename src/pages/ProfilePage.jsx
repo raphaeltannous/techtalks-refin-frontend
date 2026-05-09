@@ -79,9 +79,9 @@ function ProfilePage() {
       // }
 
       setProfile({
-        fullName: data.full_name || "",
+        fullName: data.name || "",
         profileImage: data.profile_picture || "",
-        coverImage: data.profile_banner || "",
+        coverImage: data.banner || "",
         headline: data.headline || "",
         about: data.about || "",
         location: data.location || "",

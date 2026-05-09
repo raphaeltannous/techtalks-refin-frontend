@@ -99,6 +99,14 @@ function LoginPage() {
             />
           </div>
 
+          <p className="forgot-password-wrapper">
+            <Link to="/forgot-password" className="auth-link">
+                Forgot password?
+            </Link>
+          </p>
+
+
+
           {error && <div className="auth-error">{error}</div>}
 
           <button
