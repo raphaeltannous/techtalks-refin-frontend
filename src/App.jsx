@@ -1,6 +1,9 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom"
+
 import LandingPage from "./pages/LandingPage"
 import ProfilePage from "./pages/ProfilePage"
+import JobsPage from "./pages/JobsPage"
+import JobDetailsPage from "./pages/JobDetailsPage"
 import LoginPage from "./pages/LoginPage"
 import SignupPage from "./pages/SignupPage"
 import ProtectedRoute from "./components/ProtectedRoute"
@@ -12,11 +15,15 @@ function App() {
   return (
     <Router>
       <Routes>
-        {/*Unprotected routes*/}
-
+        {/* Unprotected Routes */}
         <Route path="/" element={<LandingPage />} />
-        {/*Jobs page here*/}
+
+        <Route path="/jobs" element={<JobsPage />} />
+
+        <Route path="/jobs/:jobId" element={<JobDetailsPage />} />
+
         <Route path="/login" element={<LoginPage />} />
+
         <Route path="/signup" element={<SignupPage />} />
 
         <Route path="/profile" element={<ProfilePage />} />
@@ -25,9 +32,13 @@ function App() {
         <Route path="/reset-password" element={<ResetPasswordPage />} />
         {/*Dashboard page here*/}
 
+        {/* Protected Routes */}
+        {/* Dashboard page here */}
       </Routes>
     </Router>
   )
 }
+
+
 
 export default App
