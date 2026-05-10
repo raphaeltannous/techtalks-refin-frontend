@@ -1,24 +1,22 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom"
+
 import LandingPage from "./pages/LandingPage"
-//import jobs page here
 import LoginPage from "./pages/LoginPage"
 import SignupPage from "./pages/SignupPage"
+import DashboardUserProfileManagementPage from "./pages/DashboardUserProfileManagementPage"
 
 function App() {
   return (
     <Router>
       <Routes>
-        {/*Unprotected routes*/}
-
         <Route path="/" element={<LandingPage />} />
-        {/*Jobs page here*/}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
 
-        {/*Protected Routes*/}
-        
-        {/*Dashboard page here*/}
-        
+        <Route
+          path="/dashboard/users/:userId"
+          element={<DashboardUserProfileManagementPage />}
+        />
       </Routes>
     </Router>
   )
