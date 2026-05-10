@@ -21,6 +21,7 @@ function Navbar() {
               />
             </svg>
           </div>
+
           <span className="navbar-brand-text">RefIn</span>
         </Link>
 
@@ -28,15 +29,19 @@ function Navbar() {
         <div className="navbar-links">
           <Link
             to="/jobs"
-            className={`navbar-link ${isActive("/jobs") ? "navbar-link-active" : ""}`}
+            className={`navbar-link ${
+              isActive("/jobs") ? "navbar-link-active" : ""
+            }`}
           >
             Jobs
           </Link>
 
           <Link
-            to="/dashboard"
+            to="/dashboard/users/1"
             className={`navbar-link ${
-              isActive("/dashboard") ? "navbar-link-active" : ""
+              location.pathname.includes("/dashboard")
+                ? "navbar-link-active"
+                : ""
             }`}
           >
             Dashboard
@@ -44,7 +49,9 @@ function Navbar() {
 
           <Link
             to="/profile"
-            className={`navbar-link ${isActive("/profile") ? "navbar-link-active" : ""}`}
+            className={`navbar-link ${
+              isActive("/profile") ? "navbar-link-active" : ""
+            }`}
           >
             Profile
           </Link>
