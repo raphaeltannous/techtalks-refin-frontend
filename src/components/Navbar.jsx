@@ -8,7 +8,6 @@ function Navbar() {
   return (
     <nav className="navbar glass">
       <div className="navbar-inner">
-        {/* Brand */}
         <Link to="/" className="navbar-brand">
           <div className="navbar-brand-icon">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
@@ -25,7 +24,6 @@ function Navbar() {
           <span className="navbar-brand-text">RefIn</span>
         </Link>
 
-        {/* Links */}
         <div className="navbar-links">
           <Link
             to="/jobs"

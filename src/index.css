@@ -950,6 +950,7 @@ button:hover{
 .jobs-page {
 /* Applications Page */
 .applications-page {
+}.public-profile-page {
   min-height: 100vh;
   padding: 120px 20px 60px;
   position: relative;
@@ -960,6 +961,7 @@ button:hover{
   width: 100%;
   max-width: 1180px;
 .applications-container {
+.public-profile-container {
   width: 100%;
   max-width: 1100px;
   margin: 0 auto;
@@ -982,6 +984,33 @@ button:hover{
 }
 
 .applications-badge {
+.public-profile-hero {
+  padding: 42px;
+  border-radius: 32px;
+  margin-bottom: 24px;
+}
+
+.public-profile-top {
+  display: flex;
+  align-items: center;
+  gap: 26px;
+}
+
+.public-profile-avatar {
+  width: 110px;
+  height: 110px;
+  border-radius: 30px;
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  color: white;
+  font-size: 36px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 20px 45px rgba(34, 197, 94, 0.3);
+}
+
+.public-profile-badge {
   display: inline-block;
   padding: 8px 14px;
   border-radius: 999px;
@@ -1376,6 +1405,63 @@ button:hover{
 
 .job-details-main,
 .job-details-sidebar {
+  margin: 0 0 10px;
+}
+
+.public-profile-main-info h1 {
+  margin: 0;
+  font-size: 44px;
+  line-height: 1.1;
+  color: #14532d;
+}
+
+.public-profile-headline {
+  margin: 10px 0 4px;
+  font-size: 18px;
+  color: #256d3b;
+  font-weight: 600;
+}
+
+.public-profile-location {
+  margin: 0;
+  color: #5f8d6d;
+}
+
+.public-profile-bio {
+  max-width: 780px;
+  margin: 28px 0 0;
+  color: #4b7a5a;
+  font-size: 17px;
+  line-height: 1.8;
+}
+
+.public-profile-actions {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-top: 30px;
+}
+
+.public-profile-action,
+.public-profile-outline-action {
+  text-decoration: none;
+  padding: 14px 22px;
+  border-radius: 15px;
+  font-weight: 700;
+}
+
+.public-profile-outline-action {
+  color: #166534;
+}
+
+.public-profile-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.public-profile-card {
   padding: 30px;
   border-radius: 28px;
 }
@@ -1436,6 +1522,34 @@ button:hover{
   border-radius: 999px;
   background: rgba(34, 197, 94, 0.12);
   color: #15803d;
+.public-profile-card h2 {
+  margin: 0 0 20px;
+  color: #14532d;
+  font-size: 24px;
+}
+
+.public-profile-skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.public-profile-skills span {
+  padding: 10px 15px;
+  border-radius: 999px;
+  background: rgba(34, 197, 94, 0.12);
+  color: #15803d;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.public-profile-details {
+  display: grid;
+  gap: 18px;
+}
+
+.public-profile-details small {
+  color: #6b8f77;
   font-size: 13px;
   font-weight: 700;
 }
@@ -1454,6 +1568,52 @@ button:hover{
 
 @media (max-width: 850px) {
   .job-details-hero {
+.public-profile-details p {
+  margin: 5px 0 0;
+  color: #14532d;
+  font-weight: 700;
+}
+
+.public-profile-experience-list {
+  display: grid;
+  gap: 16px;
+}
+
+.public-profile-experience-item {
+  padding: 20px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.52);
+  border: 1px solid rgba(34, 197, 94, 0.12);
+}
+
+.public-profile-experience-item h3 {
+  margin: 0;
+  color: #14532d;
+  font-size: 18px;
+}
+
+.public-profile-experience-item div p {
+  margin: 6px 0 0;
+  color: #16a34a;
+  font-weight: 700;
+}
+
+.public-profile-experience-item span {
+  display: inline-block;
+  margin: 12px 0;
+  color: #6b8f77;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.public-profile-experience-item > p {
+  margin: 0;
+  color: #4b7a5a;
+  line-height: 1.7;
+}
+
+@media (max-width: 768px) {
+  .public-profile-top {
     flex-direction: column;
     align-items: flex-start;
   }
@@ -1511,5 +1671,17 @@ button:hover{
 
   .applications-card {
     padding: 22px;
+  }
+  .public-profile-main-info h1 {
+    font-size: 34px;
+  }
+
+  .public-profile-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .public-profile-hero,
+  .public-profile-card {
+    padding: 24px;
   }
 }

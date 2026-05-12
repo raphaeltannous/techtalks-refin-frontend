@@ -12,6 +12,9 @@ import ResetPasswordPage from "./pages/ResetPasswordPage"
 
 
 import ApplicationsPage from "./pages/ApplicationsPage"
+import LoginPage from "./pages/LoginPage"
+import SignupPage from "./pages/SignupPage"
+import PublicUserProfilePage from "./pages/PublicUserProfilePage"
 
 function App() {
   return (
@@ -25,6 +28,9 @@ function App() {
         <Route path="/jobs/:jobId" element={<JobDetailsPage />} />
 
         <Route path="/" element={<LandingPage />} />
+        {/* Public Routes */}
+        <Route path="/" element={<LandingPage />} />
+
         <Route path="/login" element={<LoginPage />} />
 
         <Route path="/signup" element={<SignupPage />} />
@@ -38,6 +44,12 @@ function App() {
         {/* Protected Routes */}
         {/* Dashboard page here */}
         <Route path="/applications" element={<ApplicationsPage />} />
+        {/* Public User Profile */}
+      <Route path="/users/:userId" element={<PublicUserProfilePage />} />
+
+        {/* Future Pages */}
+        {/* <Route path="/jobs" element={<JobsPage />} /> */}
+        {/* <Route path="/dashboard" element={<DashboardPage />} /> */}
       </Routes>
     </Router>
   )
