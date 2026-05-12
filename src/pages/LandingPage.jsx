@@ -32,9 +32,6 @@ function LandingPage() {
               Create Account
             </Link>
 
-            <Link to="/users/1" className="glass landing-secondary-button">
-              View Public Profile
-            </Link>
           </div>
         </main>
       </div>

@@ -46,20 +46,9 @@ function Navbar() {
           </Link>
 
           <Link
-            to="/dashboard"
+            to="/profile"
             className={`navbar-link ${
-              isActive("/dashboard")
-                ? "navbar-link-active"
-                : ""
-            }`}
-          >
-            Dashboard
-          </Link>
-
-          <Link
-            to="/users/1"
-            className={`navbar-link ${
-              location.pathname.startsWith("/users")
+              location.pathname.startsWith("/profile")
                 ? "navbar-link-active"
                 : ""
             }`}

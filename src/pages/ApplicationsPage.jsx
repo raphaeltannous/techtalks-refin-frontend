@@ -43,69 +43,78 @@ function ApplicationsPage() {
         <div className="auth-bg-circle auth-bg-circle-bottom" />
 
         <main className="applications-container">
+          {/* HERO */}
           <section className="applications-header glass-strong">
-            <div>
-              <p className="applications-badge">My Applications</p>
-              <h1>Track your job applications</h1>
-              <p>
-                View your submitted applications, follow their progress, and
-                stay updated on your next career opportunities.
-              </p>
-            </div>
-
-            <div className="applications-summary">
+            <div className="applications-header-content">
               <div>
-                <span>{applications.length}</span>
-                <p>Total Applications</p>
+                <p className="applications-badge">My Applications</p>
+
+                <h1>Track Your Applications</h1>
+
+                <p className="applications-description">
+                  Follow your application progress, monitor interviews,
+                  and stay updated with your career opportunities.
+                </p>
               </div>
 
-              <div>
-                <span>1</span>
-                <p>Interviews</p>
-              </div>
+              <div className="applications-summary">
+                <div className="applications-summary-card">
+                  <span>{applications.length}</span>
+                  <p>Total Applications</p>
+                </div>
 
-              <div>
-                <span>1</span>
-                <p>Accepted</p>
+                <div className="applications-summary-card">
+                  <span>1</span>
+                  <p>Interviews</p>
+                </div>
+
+                <div className="applications-summary-card">
+                  <span>1</span>
+                  <p>Accepted</p>
+                </div>
               </div>
             </div>
           </section>
 
+          {/* APPLICATIONS */}
           <section className="applications-list">
             {applications.map((application) => (
-              <article key={application.id} className="applications-card glass-strong">
-                <div className="applications-card-main">
+              <article
+                key={application.id}
+                className="applications-card glass"
+              >
+                <div className="applications-card-top">
                   <div className="applications-icon">
                     {application.company.charAt(0)}
                   </div>
 
-                  <div>
+                  <div className="applications-job-info">
                     <h2>{application.jobTitle}</h2>
+
                     <p>{application.company}</p>
                   </div>
+
+                  <span
+                    className={`applications-status ${application.statusClass}`}
+                  >
+                    {application.status}
+                  </span>
                 </div>
 
-                <div className="applications-meta">
-                  <div>
+                <div className="applications-meta-grid">
+                  <div className="applications-meta-item">
                     <small>Location</small>
                     <span>{application.location}</span>
                   </div>
 
-                  <div>
+                  <div className="applications-meta-item">
                     <small>Type</small>
                     <span>{application.type}</span>
                   </div>
 
-                  <div>
+                  <div className="applications-meta-item">
                     <small>Applied</small>
                     <span>{application.appliedDate}</span>
-                  </div>
-
-                  <div>
-                    <small>Status</small>
-                    <span className={`applications-status ${application.statusClass}`}>
-                      {application.status}
-                    </span>
                   </div>
                 </div>
               </article>

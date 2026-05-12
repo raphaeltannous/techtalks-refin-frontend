@@ -109,9 +109,12 @@ function JobsPage() {
                 </div>
 
                 <div className="jobs-card-actions">
-                  <button className="btn-primary jobs-apply-button">
+                  <Link
+                    to={`/jobs/${job.id}/apply`}
+                    className="btn-primary jobs-apply-button"
+                  >
                     Apply Now
-                  </button>
+                  </Link>
 
                   <Link
                     to={`/jobs/${job.id}`}
