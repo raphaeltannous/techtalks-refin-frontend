@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { useNavigate, Link } from "react-router-dom"
 import { setToken } from "../utils/auth"
+import { loginUser } from "../services/authService"
 import Navbar from "../components/Navbar"
 
 function LoginPage() {
@@ -10,37 +11,25 @@ function LoginPage() {
   const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
 
-  const handleLogin = async () => {
-    if (!email.trim() || !password.trim()) {
-      setError("Please fill in all fields")
-      return
-    }
 
-    setLoading(true)
+  const handleSubmit = async (e) => {
+  e.preventDefault()
+
+  try {
     setError("")
 
-    try {
-      const response = await fetch("http://localhost:8000/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      })
+    const data = await loginUser(email, password)
 
-      const data = await response.json()
+    localStorage.setItem("token", data.access_token)
 
-      if (!response.ok) {
-        setError(data.detail || "Invalid email or password")
-        return
-      }
-
-      setToken(data.token)
-      navigate("/jobs")
-    } catch {
-      setError("Something went wrong. Is the backend running?")
-    } finally {
-      setLoading(false)
-    }
+    navigate("/jobs")
+  } catch (error) {
+    setError(
+      error.response?.data?.detail ||
+      "Login failed"
+    )
   }
+}
 
   const handleKeyDown = (e) => {
     if (e.key === "Enter") handleLogin()

@@ -12,6 +12,18 @@ import ResetPasswordPage from "./pages/ResetPasswordPage"
 import ApplicationsPage from "./pages/ApplicationsPage"
 import ApplyJobPage from "./pages/ApplyJobPage"
 
+useEffect(() => {
+  const checkAuth = async () => {
+    try {
+      await checkLoginStatus()
+    } catch {
+      localStorage.removeItem("token")
+    }
+  }
+
+  checkAuth()
+}, [])
+
 
 function App() {
   return (
@@ -22,11 +34,13 @@ function App() {
         <Route path="/jobs/:jobId" element={<JobDetailsPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
-        <Route path="/profile" element={<ProfilePage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route path="/applications" element={<ApplicationsPage />} />
         <Route path="/jobs/:jobId/apply" element={<ApplyJobPage/>}/>
+
+        <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>}/>
+      
       </Routes>
     </Router>
   )

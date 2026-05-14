@@ -1,5 +1,12 @@
 import { Link, useLocation } from "react-router-dom"
 
+
+const handleLogout = () => {
+  localStorage.removeItem("token")
+
+  navigate("/login")
+}
+
 function Navbar() {
   const location = useLocation()
 

@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
+import { resetPassword } from "../services/authService"
 
 function ResetPasswordPage() {
   const [password, setPassword] = useState("")
@@ -10,89 +11,31 @@ function ResetPasswordPage() {
 
   const navigate = useNavigate()
 
-  const handleResetPassword = async (e) => {
-    e.preventDefault()
+  const handleSubmit = async (e) => {
+  e.preventDefault()
 
-    if (!password) {
-      setError("Please enter a new password")
-      return
-    }
-
-    if (password.length < 8) {
-      setError("Password must be at least 8 characters")
-      return
-    }
-
-    if (!confirmPassword) {
-      setError("Please confirm your password")
-      return
-    }
-
-    if (password !== confirmPassword) {
-      setError("Passwords do not match")
-      return
-    }
-
-    setLoading(true)
+  try {
     setError("")
     setSuccess("")
 
-    try {
+    await resetPassword(
+      token,
+      password,
+      confirmPassword
+    )
 
-      // =====================================================
-      // BACKEND TEAM:
-      // Replace request body depending on backend implementation
-      // =====================================================
+    setSuccess("Password updated successfully")
 
-      const response = await fetch("http://localhost:8000/password-reset", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-
-        // =====================================================
-        // BACKEND TEAM:
-        // Replace with actual backend body
-        //
-        // EXAMPLES:
-        //
-        // { token, new_password: password }
-        //
-        // OR
-        //
-        // { email, code, new_password: password }
-        // =====================================================
-
-        body: JSON.stringify({
-          new_password: password,
-        }),
-      })
-
-      const data = await response.json()
-
-      if (!response.ok) {
-
-        // =====================================================
-        // BACKEND TEAM:
-        // Confirm exact backend error response
-        // =====================================================
-
-        setError(data.detail || "Something went wrong")
-        return
-      }
-
-      setSuccess("Password reset successfully")
-
-      setTimeout(() => {
-        navigate("/login")
-      }, 1500)
-
-    } catch (err) {
-      setError("Server connection failed")
-    } finally {
-      setLoading(false)
-    }
+    setTimeout(() => {
+      navigate("/login")
+    }, 2000)
+  } catch (error) {
+    setError(
+      error.response?.data?.detail ||
+      "Reset failed"
+    )
   }
+}
 
   return (
     <div className="auth-page">

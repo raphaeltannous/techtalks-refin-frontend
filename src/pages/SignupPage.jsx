@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { useNavigate, Link } from "react-router-dom"
 import { setToken } from "../utils/auth"
+import { registerUser } from "../services/authService"
 import Navbar from "../components/Navbar"
 
 function SignupPage() {
@@ -31,42 +32,27 @@ function SignupPage() {
     return null
   }
 
-  const handleSignup = async () => {
-    const err = validateForm()
-    if (err) {
-      setError(err)
-      return
-    }
+  const handleSubmit = async (e) => {
+  e.preventDefault()
 
-    setLoading(true)
+  try {
     setError("")
 
-    try {
-      const response = await fetch("http://localhost:8000/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          full_name: fullName,
-          email,
-          password,
-        }),
-      })
+    await registerUser({
+      username,
+      email,
+      password,
+      name,
+    })
 
-      const data = await response.json()
-
-      if (!response.ok) {
-        setError(data.detail || "Something went wrong")
-        return
-      }
-
-      setToken(data.token)
-      navigate("/jobs")
-    } catch {
-      setError("Something went wrong. Is the backend running?")
-    } finally {
-      setLoading(false)
-    }
+    navigate("/login")
+  } catch (error) {
+    setError(
+      error.response?.data?.detail ||
+      "Signup failed"
+    )
   }
+}
 
   const handleKeyDown = (e) => {
     if (e.key === "Enter") handleSignup()

@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { Link } from "react-router-dom"
+import { forgotPassword } from "../services/authService"
 
 function ForgotPasswordPage() {
   const [email, setEmail] = useState("")
@@ -7,71 +8,23 @@ function ForgotPasswordPage() {
   const [error, setError] = useState("")
   const [success, setSuccess] = useState("")
 
-  const handleForgotPassword = async (e) => {
-    e.preventDefault()
+  const handleSubmit = async (e) => {
+  e.preventDefault()
 
-    if (!email.trim()) {
-      setError("Please enter your email")
-      return
-    }
-
-    setLoading(true)
+  try {
     setError("")
     setSuccess("")
 
-    try {
+    const data = await forgotPassword(email)
 
-      // =====================================================
-      // BACKEND TEAM:
-      // Replace request body if backend expects different fields
-      // =====================================================
-
-      const response = await fetch("http://localhost:8000/password-reset", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-
-        // =====================================================
-        // BACKEND TEAM:
-        // Confirm exact request body
-        // Example:
-        // { email }
-        // =====================================================
-
-        body: JSON.stringify({
-          email,
-        }),
-      })
-
-      const data = await response.json()
-
-      if (!response.ok) {
-
-        // =====================================================
-        // BACKEND TEAM:
-        // Confirm exact error response structure
-        // =====================================================
-
-        setError(data.detail || "Something went wrong")
-        return
-      }
-
-      // =====================================================
-      // BACKEND TEAM:
-      // Confirm exact success response
-      // =====================================================
-
-      setSuccess(
-        "If an account exists with this email, reset instructions have been sent."
-      )
-
-    } catch (err) {
-      setError("Server connection failed")
-    } finally {
-      setLoading(false)
-    }
+    setSuccess(data.message)
+  } catch (error) {
+    setError(
+      error.response?.data?.detail ||
+      "Something went wrong"
+    )
   }
+}
 
   return (
     <div className="auth-page">
