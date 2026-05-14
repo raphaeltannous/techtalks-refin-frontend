@@ -1,21 +1,25 @@
 import { useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 import Navbar from "../components/Navbar"
+import API from "../services/api"
 
 function ApplyJobPage() {
+  const { id } = useParams()
+
   const navigate = useNavigate()
-  const { jobId } = useParams()
 
   const [formData, setFormData] = useState({
-    fullName: "",
+    full_name: "",
     email: "",
     phone: "",
-    university: "",
-    experience: "",
-    coverLetter: "",
+    cover_letter: "",
   })
 
   const [resume, setResume] = useState(null)
+
+  const [loading, setLoading] = useState(false)
+  const [success, setSuccess] = useState("")
+  const [error, setError] = useState("")
 
   const handleChange = (e) => {
     setFormData({
@@ -24,170 +28,161 @@ function ApplyJobPage() {
     })
   }
 
-  const handleResumeChange = (e) => {
-    setResume(e.target.files[0])
-  }
-
   const handleSubmit = async (e) => {
     e.preventDefault()
 
-    console.log({
-      jobId,
-      formData,
-      resume,
-    })
+    setLoading(true)
+    setError("")
+    setSuccess("")
 
-    // =========================
-    // BACKEND INTEGRATION HERE
-    // =========================
+    try {
+      const data = new FormData()
 
-    alert("Application submitted successfully!")
+      data.append("full_name", formData.full_name)
+      data.append("email", formData.email)
+      data.append("phone", formData.phone)
+      data.append("cover_letter", formData.cover_letter)
 
-    navigate("/applications")
+      if (resume) {
+        data.append("resume", resume)
+      }
+
+      await API.post(`/job/application/by-job/${id}`, data, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+
+      setSuccess("Application submitted successfully!")
+
+      setTimeout(() => {
+        navigate("/applications")
+      }, 1500)
+    } catch (err) {
+      console.log(err)
+      setError("Failed to submit application")
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
     <>
       <Navbar />
 
-      <div className="apply-page">
+      <div className="auth-page">
         <div className="auth-bg-circle auth-bg-circle-top" />
         <div className="auth-bg-circle auth-bg-circle-bottom" />
 
-        <main className="apply-container">
-          <section className="apply-card glass-strong">
-            <div className="apply-header">
-              <p className="apply-badge">
-                Job Application
-              </p>
+        <div className="auth-card glass-strong">
+          <div className="auth-header">
+            <h1 className="auth-title">Apply For Job</h1>
 
-              <h1>Submit Your Application</h1>
+            <p className="auth-subtitle">
+              Complete your application below.
+            </p>
+          </div>
 
-              <p>
-                Fill in your information and upload your
-                resume to apply for this position.
-              </p>
+          <form
+            className="auth-form"
+            onSubmit={handleSubmit}
+          >
+            <div className="form-group">
+              <label className="form-label">
+                Full Name
+              </label>
+
+              <input
+                type="text"
+                name="full_name"
+                className="auth-input glass-input"
+                value={formData.full_name}
+                onChange={handleChange}
+                required
+              />
             </div>
 
-            <form
-              onSubmit={handleSubmit}
-              className="apply-form"
+            <div className="form-group">
+              <label className="form-label">
+                Email
+              </label>
+
+              <input
+                type="email"
+                name="email"
+                className="auth-input glass-input"
+                value={formData.email}
+                onChange={handleChange}
+                required
+              />
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">
+                Phone
+              </label>
+
+              <input
+                type="text"
+                name="phone"
+                className="auth-input glass-input"
+                value={formData.phone}
+                onChange={handleChange}
+                required
+              />
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">
+                Cover Letter
+              </label>
+
+              <textarea
+                name="cover_letter"
+                className="auth-input glass-input"
+                rows="5"
+                value={formData.cover_letter}
+                onChange={handleChange}
+              />
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">
+                Resume
+              </label>
+
+              <input
+                type="file"
+                onChange={(e) =>
+                  setResume(e.target.files[0])
+                }
+                required
+              />
+            </div>
+
+            {success && (
+              <div className="auth-success">
+                {success}
+              </div>
+            )}
+
+            {error && (
+              <div className="auth-error">
+                {error}
+              </div>
+            )}
+
+            <button
+              type="submit"
+              className="auth-button btn-primary"
+              disabled={loading}
             >
-              <div className="form-group">
-                <label className="form-label">
-                  Full Name
-                </label>
-
-                <input
-                  type="text"
-                  name="fullName"
-                  placeholder="John Doe"
-                  className="auth-input glass-input"
-                  value={formData.fullName}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">
-                  Email Address
-                </label>
-
-                <input
-                  type="email"
-                  name="email"
-                  placeholder="john@example.com"
-                  className="auth-input glass-input"
-                  value={formData.email}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">
-                  Phone Number
-                </label>
-
-                <input
-                  type="text"
-                  name="phone"
-                  placeholder="+961 ..."
-                  className="auth-input glass-input"
-                  value={formData.phone}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">
-                  University
-                </label>
-
-                <input
-                  type="text"
-                  name="university"
-                  placeholder="LIU"
-                  className="auth-input glass-input"
-                  value={formData.university}
-                  onChange={handleChange}
-                />
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">
-                  Experience
-                </label>
-
-                <input
-                  type="text"
-                  name="experience"
-                  placeholder="2 years experience"
-                  className="auth-input glass-input"
-                  value={formData.experience}
-                  onChange={handleChange}
-                />
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">
-                  Cover Letter
-                </label>
-
-                <textarea
-                  name="coverLetter"
-                  placeholder="Tell us why you're a good fit..."
-                  className="auth-input glass-input apply-textarea"
-                  value={formData.coverLetter}
-                  onChange={handleChange}
-                />
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">
-                  Upload Resume
-                </label>
-
-                <input
-                  type="file"
-                  accept=".pdf,.doc,.docx"
-                  className="apply-file-input"
-                  onChange={handleResumeChange}
-                  required
-                />
-              </div>
-
-              <button
-                type="submit"
-                className="auth-button btn-primary"
-              >
-                Submit Application
-              </button>
-            </form>
-          </section>
-        </main>
+              {loading
+                ? "Submitting..."
+                : "Submit Application"}
+            </button>
+          </form>
+        </div>
       </div>
     </>
   )

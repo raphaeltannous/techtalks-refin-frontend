@@ -1,38 +1,47 @@
+import { useEffect, useState } from "react"
 import Navbar from "../components/Navbar"
+import API from "../services/api"
 
 function ApplicationsPage() {
-  const applications = [
-    {
-      id: 1,
-      jobTitle: "Frontend Developer Intern",
-      company: "RefIn",
-      location: "Beirut, Lebanon",
-      type: "Internship",
-      appliedDate: "May 2026",
-      status: "Under Review",
-      statusClass: "applications-status-review",
-    },
-    {
-      id: 2,
-      jobTitle: "Junior React Developer",
-      company: "TechBridge",
-      location: "Remote",
-      type: "Full-time",
-      appliedDate: "April 2026",
-      status: "Interview",
-      statusClass: "applications-status-interview",
-    },
-    {
-      id: 3,
-      jobTitle: "UI/UX Assistant",
-      company: "Creative Labs",
-      location: "Hybrid",
-      type: "Part-time",
-      appliedDate: "April 2026",
-      status: "Accepted",
-      statusClass: "applications-status-accepted",
-    },
-  ]
+  const [applications, setApplications] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    fetchApplications()
+  }, [])
+
+  const fetchApplications = async () => {
+    try {
+      const response = await API.get(
+        "/job/application/my-applications"
+      )
+
+      console.log(response.data)
+
+      setApplications(response.data.data || response.data)
+    } catch (error) {
+      console.log(error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const acceptedCount = applications.filter(
+    (app) => app.status === "accepted"
+  ).length
+
+  const interviewCount = applications.filter(
+    (app) => app.status === "interview"
+  ).length
+
+  if (loading) {
+    return (
+      <>
+        <Navbar />
+        <h1>Loading...</h1>
+      </>
+    )
+  }
 
   return (
     <>
@@ -43,78 +52,77 @@ function ApplicationsPage() {
         <div className="auth-bg-circle auth-bg-circle-bottom" />
 
         <main className="applications-container">
-          {/* HERO */}
           <section className="applications-header glass-strong">
-            <div className="applications-header-content">
+            <div>
+              <p className="applications-badge">
+                My Applications
+              </p>
+
+              <h1>
+                Track your job applications
+              </h1>
+
+              <p>
+                View your submitted applications
+                and follow their progress.
+              </p>
+            </div>
+
+            <div className="applications-summary">
               <div>
-                <p className="applications-badge">My Applications</p>
-
-                <h1>Track Your Applications</h1>
-
-                <p className="applications-description">
-                  Follow your application progress, monitor interviews,
-                  and stay updated with your career opportunities.
-                </p>
+                <span>{applications.length}</span>
+                <p>Total Applications</p>
               </div>
 
-              <div className="applications-summary">
-                <div className="applications-summary-card">
-                  <span>{applications.length}</span>
-                  <p>Total Applications</p>
-                </div>
+              <div>
+                <span>{interviewCount}</span>
+                <p>Interviews</p>
+              </div>
 
-                <div className="applications-summary-card">
-                  <span>1</span>
-                  <p>Interviews</p>
-                </div>
-
-                <div className="applications-summary-card">
-                  <span>1</span>
-                  <p>Accepted</p>
-                </div>
+              <div>
+                <span>{acceptedCount}</span>
+                <p>Accepted</p>
               </div>
             </div>
           </section>
 
-          {/* APPLICATIONS */}
           <section className="applications-list">
             {applications.map((application) => (
               <article
                 key={application.id}
-                className="applications-card glass"
+                className="applications-card glass-strong"
               >
-                <div className="applications-card-top">
+                <div className="applications-card-main">
                   <div className="applications-icon">
-                    {application.company.charAt(0)}
+                    {application.job_title?.charAt(0) || "J"}
                   </div>
 
-                  <div className="applications-job-info">
-                    <h2>{application.jobTitle}</h2>
+                  <div>
+                    <h2>
+                      {application.job_title}
+                    </h2>
 
-                    <p>{application.company}</p>
+                    <p>
+                      {application.company_name}
+                    </p>
                   </div>
-
-                  <span
-                    className={`applications-status ${application.statusClass}`}
-                  >
-                    {application.status}
-                  </span>
                 </div>
 
-                <div className="applications-meta-grid">
-                  <div className="applications-meta-item">
-                    <small>Location</small>
-                    <span>{application.location}</span>
+                <div className="applications-meta">
+                  <div>
+                    <small>Status</small>
+
+                    <span className="applications-status applications-status-review">
+                      {application.status}
+                    </span>
                   </div>
 
-                  <div className="applications-meta-item">
-                    <small>Type</small>
-                    <span>{application.type}</span>
-                  </div>
+                  <div>
+                    <small>Applied At</small>
 
-                  <div className="applications-meta-item">
-                    <small>Applied</small>
-                    <span>{application.appliedDate}</span>
+                    <span>
+                      {application.created_at}
+                    </span>
                   </div>
                 </div>
               </article>

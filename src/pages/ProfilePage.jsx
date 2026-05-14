@@ -1,598 +1,591 @@
 import { useEffect, useState } from "react"
 import Navbar from "../components/Navbar"
 
-// Small trash icon for delete buttons
-function TrashIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-      <path d="M3 6h18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-      <path
-        d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
-      <path
-        d="M19 6l-1 13a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path d="M10 11v6M14 11v6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-    </svg>
-  )
-}
+import {
+  getProfileByUsername,
+  updateProfile,
+  getSkills,
+  addSkill,
+  deleteSkill,
+  getExperiences,
+  addExperience,
+  deleteExperience,
+  getEducations,
+  addEducation,
+  deleteEducation,
+  uploadProfilePicture,
+  uploadBanner,
+} from "../services/profileService"
 
 function ProfilePage() {
-  const [profile, setProfile] = useState(null)
-  const [loading, setLoading] = useState(true)
-  const [saving, setSaving] = useState(false)
-  const [error, setError] = useState("")
-  const [isEditing, setIsEditing] = useState(false)
+  const username =
+    localStorage.getItem("username") || "test"
+
+  const [profile, setProfile] = useState({
+    full_name: "",
+    headline: "",
+    bio: "",
+    location: "",
+  })
+
+  const [skills, setSkills] = useState([])
+  const [experiences, setExperiences] = useState([])
+  const [educations, setEducations] = useState([])
+
+  const [profilePicture, setProfilePicture] =
+  useState(null)
+
+  const [banner, setBanner] =
+  useState(null)
+
+  const [newSkill, setNewSkill] = useState("")
+
+  const [experienceForm, setExperienceForm] =
+    useState({
+      title: "",
+      company: "",
+      description: "",
+    })
+
+  const [educationForm, setEducationForm] =
+    useState({
+      school: "",
+      degree: "",
+    })
 
   useEffect(() => {
-    fetchProfile()
+    fetchAll()
   }, [])
 
-  const fetchProfile = async () => {
+  const fetchAll = async () => {
     try {
-      setLoading(true)
-      setError("")
+      const profileData =
+        await getProfileByUsername(username)
 
-      const token = localStorage.getItem("token")
+      setProfile(profileData.data || profileData)
 
-      // BACKEND TEAM: I need an endpoint for current logged-in user profile
-      // Example:
-      // GET /profile/me
-      // Headers:
-      // Authorization: Bearer <token>
-      //
-      // I also need to know if full_name comes from this endpoint
-      // or from another endpoint like GET /auth/me
+      const skillsData =
+        await getSkills(username)
 
-      const response = await fetch("http://localhost:8000/profile/me", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
+      setSkills(skillsData.data || skillsData)
 
-      const data = await response.json()
+      const experiencesData =
+        await getExperiences(username)
 
-      if (!response.ok) {
-        setError(data.detail || "Failed to load profile")
-        return
-      }
+      setExperiences(
+        experiencesData.data || experiencesData
+      )
 
-      // BACKEND TEAM: Please confirm exact response shape.
-      // Right now frontend expects something like:
-      // {
-      //   full_name: "",
-      //   profile_picture: "",
-      //   profile_banner: "",
-      //   headline: "",
-      //   about: "",
-      //   location: "",
-      //   experience: [],
-      //   certifications: [],
-      //   skills: []
-      // }
+      const educationsData =
+        await getEducations(username)
 
-      setProfile({
-        fullName: data.name || "",
-        profileImage: data.profile_picture || "",
-        coverImage: data.banner || "",
-        headline: data.headline || "",
-        about: data.about || "",
-        location: data.location || "",
-        experience: data.experience || [],
-        certifications: data.certifications || [],
-        skills: data.skills || [],
-      })
-    } catch {
-      setError("Something went wrong while loading profile")
-    } finally {
-      setLoading(false)
+      setEducations(
+        educationsData.data || educationsData
+      )
+    } catch (error) {
+      console.log(error)
     }
   }
 
-  const handleSaveProfile = async () => {
+  const handleProfileUpdate = async () => {
     try {
-      setSaving(true)
-      setError("")
+      await updateProfile(profile)
 
-      const token = localStorage.getItem("token")
-
-      // BACKEND TEAM: I need an endpoint to save the full profile
-      // Example:
-      // PUT /profile/me
-      //
-      // Request body the frontend will send:
-      // {
-      //   full_name,
-      //   profile_picture,
-      //   profile_banner,
-      //   headline,
-      //   about,
-      //   location,
-      //   experience,
-      //   certifications,
-      //   skills
-      // }
-      //
-      // Please confirm exact field names and whether experience /
-      // certifications / skills are accepted in this same request.
-
-      const response = await fetch("http://localhost:8000/profile/me", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          full_name: profile.fullName,
-          profile_picture: profile.profileImage,
-          profile_banner: profile.coverImage,
-          headline: profile.headline,
-          about: profile.about,
-          location: profile.location,
-          experience: profile.experience.map((item) => ({
-            id: item.id,
-            role: item.role,
-            company: item.company,
-            period: item.period,
-            description: item.description,
-          })),
-          certifications: profile.certifications.map((item) => ({
-            id: item.id,
-            name: item.name,
-            issuer: item.issuer,
-            year: item.year,
-            url: item.url || "",
-          })),
-          skills: profile.skills.filter((skill) => skill.trim() !== ""),
-        }),
-      })
-
-      const data = await response.json()
-
-      if (!response.ok) {
-        setError(data.detail || "Failed to save profile")
-        return
-      }
-
-      setProfile({
-        fullName: data.full_name || "",
-        profileImage: data.profile_picture || "",
-        coverImage: data.profile_banner || "",
-        headline: data.headline || "",
-        about: data.about || "",
-        location: data.location || "",
-        experience: data.experience || [],
-        certifications: data.certifications || [],
-        skills: data.skills || [],
-      })
-
-      setIsEditing(false)
-    } catch {
-      setError("Something went wrong while saving profile")
-    } finally {
-      setSaving(false)
+      alert("Profile updated")
+    } catch (error) {
+      console.log(error)
     }
   }
 
-  const handleBasicChange = (field, value) => {
-    setProfile((prev) => ({
-      ...prev,
-      [field]: value,
-    }))
+  const handleAddSkill = async () => {
+    if (!newSkill) return
+
+    try {
+      await addSkill({
+        name: newSkill,
+      })
+
+      setNewSkill("")
+
+      fetchAll()
+    } catch (error) {
+      console.log(error)
+    }
   }
 
-  const handleExperienceChange = (id, field, value) => {
-    setProfile((prev) => ({
-      ...prev,
-      experience: prev.experience.map((item) =>
-        item.id === id ? { ...item, [field]: value } : item
-      ),
-    }))
+  const handleDeleteSkill = async (id) => {
+    try {
+      await deleteSkill(id)
+
+      fetchAll()
+    } catch (error) {
+      console.log(error)
+    }
   }
 
-  const addExperience = () => {
-    setProfile((prev) => ({
-      ...prev,
-      experience: [
-        ...prev.experience,
-        {
-          id: Date.now(),
-          role: "",
-          company: "",
-          period: "",
-          description: "",
-        },
-      ],
-    }))
+  const handleAddExperience = async () => {
+    try {
+      await addExperience(experienceForm)
+
+      setExperienceForm({
+        title: "",
+        company: "",
+        description: "",
+      })
+
+      fetchAll()
+    } catch (error) {
+      console.log(error)
+    }
   }
 
-  const removeExperience = (id) => {
-    setProfile((prev) => ({
-      ...prev,
-      experience: prev.experience.filter((item) => item.id !== id),
-    }))
+  const handleDeleteExperience = async (
+    id
+  ) => {
+    try {
+      await deleteExperience(id)
+
+      fetchAll()
+    } catch (error) {
+      console.log(error)
+    }
   }
 
-  const handleCertificationChange = (id, field, value) => {
-    setProfile((prev) => ({
-      ...prev,
-      certifications: prev.certifications.map((item) =>
-        item.id === id ? { ...item, [field]: value } : item
-      ),
-    }))
+  const handleAddEducation = async () => {
+    try {
+      await addEducation(educationForm)
+
+      setEducationForm({
+        school: "",
+        degree: "",
+      })
+
+      fetchAll()
+    } catch (error) {
+      console.log(error)
+    }
   }
 
-  const addCertification = () => {
-    setProfile((prev) => ({
-      ...prev,
-      certifications: [
-        ...prev.certifications,
-        {
-          id: Date.now(),
-          name: "",
-          issuer: "",
-          year: "",
-          url: "",
-        },
-      ],
-    }))
+  const handleDeleteEducation = async (
+    id
+  ) => {
+    try {
+      await deleteEducation(id)
+
+      fetchAll()
+    } catch (error) {
+      console.log(error)
+    }
   }
 
-  const removeCertification = (id) => {
-    setProfile((prev) => ({
-      ...prev,
-      certifications: prev.certifications.filter((item) => item.id !== id),
-    }))
+  const handleProfilePictureUpload =
+  async () => {
+    if (!profilePicture) return
+
+    try {
+      await uploadProfilePicture(
+        profilePicture
+      )
+
+      alert(
+        "Profile picture updated"
+      )
+
+      fetchAll()
+    } catch (error) {
+      console.log(error)
+    }
   }
 
-  const handleSkillChange = (index, value) => {
-    setProfile((prev) => ({
-      ...prev,
-      skills: prev.skills.map((skill, i) => (i === index ? value : skill)),
-    }))
-  }
+const handleBannerUpload =
+  async () => {
+    if (!banner) return
 
-  const addSkill = () => {
-    setProfile((prev) => ({
-      ...prev,
-      skills: [...prev.skills, ""],
-    }))
-  }
+    try {
+      await uploadBanner(banner)
 
-  const removeSkill = (index) => {
-    setProfile((prev) => ({
-      ...prev,
-      skills: prev.skills.filter((_, i) => i !== index),
-    }))
-  }
+      alert("Banner updated")
 
-  if (loading) {
-    return (
-      <div className="profile-page">
-        <Navbar />
-        <div className="profile-wrapper">
-          <div className="profile-section glass">Loading profile...</div>
-        </div>
-      </div>
-    )
-  }
-
-  if (!profile) {
-    return (
-      <div className="profile-page">
-        <Navbar />
-        <div className="profile-wrapper">
-          <div className="profile-section glass">
-            {error || "Could not load profile"}
-          </div>
-        </div>
-      </div>
-    )
+      fetchAll()
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   return (
-    <div className="profile-page">
+    <>
       <Navbar />
 
-      <div className="profile-wrapper">
-        {error && <div className="auth-error">{error}</div>}
+      <div className="profile-page">
+        <div className="auth-bg-circle auth-bg-circle-top" />
+        <div className="auth-bg-circle auth-bg-circle-bottom" />
 
-        <div className="profile-header-card glass-strong">
-          <div
-            className="profile-cover"
-            style={{ backgroundImage: `url(${profile.coverImage})` }}
-          >
-            {isEditing && (
-              <div className="profile-cover-edit">
-                <label className="form-label">Cover image URL</label>
-                <input
-                  type="text"
-                  value={profile.coverImage}
-                  onChange={(e) => handleBasicChange("coverImage", e.target.value)}
-                  className="glass-input auth-input"
-                  placeholder="Paste cover image URL"
-                />
-              </div>
-            )}
-          </div>
+        <section className="profile-section glass-strong">
+  <h2 className="profile-section-title">
+    Upload Images
+  </h2>
 
-          <div className="profile-main-info">
-            <div className="profile-avatar-wrap">
-              <img src={profile.profileImage} alt="Profile" className="profile-avatar" />
-            </div>
+  <div className="profile-list">
+    <div>
+      <label className="form-label">
+        Profile Picture
+      </label>
 
-            <div className="profile-top-row">
-              <div className="profile-top-left">
-                {isEditing ? (
-                  <>
-                    <input
-                      type="text"
-                      value={profile.fullName}
-                      onChange={(e) => handleBasicChange("fullName", e.target.value)}
-                      className="glass-input auth-input profile-edit-input"
-                      placeholder="Full name"
-                    />
+      <input
+        type="file"
+        onChange={(e) =>
+          setProfilePicture(
+            e.target.files[0]
+          )
+        }
+      />
 
-                    <input
-                      type="text"
-                      value={profile.headline}
-                      onChange={(e) => handleBasicChange("headline", e.target.value)}
-                      className="glass-input auth-input profile-edit-input"
-                      placeholder="Headline / what you do"
-                    />
+      <button
+        className="btn-primary auth-button"
+        onClick={
+          handleProfilePictureUpload
+        }
+      >
+        Upload Picture
+      </button>
+    </div>
 
-                    <input
-                      type="text"
-                      value={profile.profileImage}
-                      onChange={(e) => handleBasicChange("profileImage", e.target.value)}
-                      className="glass-input auth-input profile-edit-input"
-                      placeholder="Paste profile image URL"
-                    />
+    <div>
+      <label className="form-label">
+        Banner
+      </label>
 
-                    <input
-                      type="text"
-                      value={profile.location}
-                      onChange={(e) => handleBasicChange("location", e.target.value)}
-                      className="glass-input auth-input profile-edit-input"
-                      placeholder="Location"
-                    />
+      <input
+        type="file"
+        onChange={(e) =>
+          setBanner(
+            e.target.files[0]
+          )
+        }
+      />
 
-                    <textarea
-                      value={profile.about}
-                      onChange={(e) => handleBasicChange("about", e.target.value)}
-                      className="glass-input auth-input profile-textarea"
-                      placeholder="About"
-                    />
-                  </>
-                ) : (
-                  <>
-                    <h1 className="profile-name">{profile.fullName}</h1>
-                    <p className="profile-title">{profile.headline}</p>
-                    {profile.location && <p className="profile-location">{profile.location}</p>}
-                    {profile.about && <p className="profile-about">{profile.about}</p>}
-                  </>
-                )}
-              </div>
+      <button
+        className="btn-primary auth-button"
+        onClick={
+          handleBannerUpload
+        }
+      >
+        Upload Banner
+      </button>
+    </div>
+  </div>
+</section>
+
+        <div className="profile-wrapper">
+          <section className="profile-section glass-strong">
+            <h1 className="profile-section-title">
+              Edit Profile
+            </h1>
+
+            <div className="profile-list">
+              <input
+                type="text"
+                className="auth-input glass-input"
+                placeholder="Full Name"
+                value={profile.full_name || ""}
+                onChange={(e) =>
+                  setProfile({
+                    ...profile,
+                    full_name:
+                      e.target.value,
+                  })
+                }
+              />
+
+              <input
+                type="text"
+                className="auth-input glass-input"
+                placeholder="Headline"
+                value={profile.headline || ""}
+                onChange={(e) =>
+                  setProfile({
+                    ...profile,
+                    headline:
+                      e.target.value,
+                  })
+                }
+              />
+
+              <input
+                type="text"
+                className="auth-input glass-input"
+                placeholder="Location"
+                value={profile.location || ""}
+                onChange={(e) =>
+                  setProfile({
+                    ...profile,
+                    location:
+                      e.target.value,
+                  })
+                }
+              />
+
+              <textarea
+                className="auth-input glass-input"
+                placeholder="Bio"
+                rows="5"
+                value={profile.bio || ""}
+                onChange={(e) =>
+                  setProfile({
+                    ...profile,
+                    bio: e.target.value,
+                  })
+                }
+              />
 
               <button
-                className="btn-primary profile-edit-button"
-                onClick={isEditing ? handleSaveProfile : () => setIsEditing(true)}
-                disabled={saving}
-                type="button"
+                className="btn-primary auth-button"
+                onClick={
+                  handleProfileUpdate
+                }
               >
-                {saving ? "Saving..." : isEditing ? "Save" : "Edit Profile"}
+                Save Profile
               </button>
             </div>
-          </div>
-        </div>
+          </section>
 
-        <section className="profile-section glass">
-          <div className="profile-section-header">
-            <h2 className="profile-section-title">Experience</h2>
-            {isEditing && (
-              <button className="profile-add-button" onClick={addExperience} type="button">
-                + Add Experience
-              </button>
-            )}
-          </div>
+          {/* SKILLS */}
 
-          <div className="profile-list">
-            {profile.experience.map((item) => (
-              <div key={item.id} className="profile-item">
-                {isEditing ? (
-                  <div className="profile-item-edit">
-                    <div className="profile-item-edit-header">
-                      <button
-                        className="profile-icon-button"
-                        onClick={() => removeExperience(item.id)}
-                        type="button"
-                        title="Delete experience"
-                      >
-                        <TrashIcon />
-                      </button>
-                    </div>
+          <section className="profile-section glass-strong">
+            <div className="profile-section-header">
+              <h2 className="profile-section-title">
+                Skills
+              </h2>
+            </div>
 
-                    <input
-                      type="text"
-                      value={item.role}
-                      onChange={(e) => handleExperienceChange(item.id, "role", e.target.value)}
-                      className="glass-input auth-input profile-edit-input"
-                      placeholder="Role"
-                    />
-                    <input
-                      type="text"
-                      value={item.company}
-                      onChange={(e) => handleExperienceChange(item.id, "company", e.target.value)}
-                      className="glass-input auth-input profile-edit-input"
-                      placeholder="Company"
-                    />
-                    <input
-                      type="text"
-                      value={item.period}
-                      onChange={(e) => handleExperienceChange(item.id, "period", e.target.value)}
-                      className="glass-input auth-input profile-edit-input"
-                      placeholder="Period"
-                    />
-                    <textarea
-                      value={item.description}
-                      onChange={(e) =>
-                        handleExperienceChange(item.id, "description", e.target.value)
-                      }
-                      className="glass-input auth-input profile-textarea"
-                      placeholder="Description"
-                    />
-                  </div>
-                ) : (
-                  <>
-                    <h3 className="profile-item-title">{item.role}</h3>
-                    <p className="profile-item-subtitle">
-                      {item.company} • {item.period}
-                    </p>
-                    <p className="profile-item-text">{item.description}</p>
-                  </>
-                )}
-              </div>
-            ))}
-          </div>
-        </section>
+            <div className="profile-skills">
+              {skills.map((skill) => (
+                <div
+                  key={skill.id}
+                  className="profile-skill-badge"
+                >
+                  {skill.name}
 
-        <section className="profile-section glass">
-          <div className="profile-section-header">
-            <h2 className="profile-section-title">Certifications</h2>
-            {isEditing && (
-              <button className="profile-add-button" onClick={addCertification} type="button">
-                + Add Certification
-              </button>
-            )}
-          </div>
-
-          <div className="profile-list">
-            {profile.certifications.map((item) => (
-              <div key={item.id} className="profile-item">
-                {isEditing ? (
-                  <div className="profile-item-edit">
-                    <div className="profile-item-edit-header">
-                      <button
-                        className="profile-icon-button"
-                        onClick={() => removeCertification(item.id)}
-                        type="button"
-                        title="Delete certification"
-                      >
-                        <TrashIcon />
-                      </button>
-                    </div>
-
-                    <input
-                      type="text"
-                      value={item.name}
-                      onChange={(e) =>
-                        handleCertificationChange(item.id, "name", e.target.value)
-                      }
-                      className="glass-input auth-input profile-edit-input"
-                      placeholder="Certification name"
-                    />
-                    <input
-                      type="text"
-                      value={item.issuer}
-                      onChange={(e) =>
-                        handleCertificationChange(item.id, "issuer", e.target.value)
-                      }
-                      className="glass-input auth-input profile-edit-input"
-                      placeholder="Issuer"
-                    />
-                    <input
-                      type="text"
-                      value={item.year}
-                      onChange={(e) =>
-                        handleCertificationChange(item.id, "year", e.target.value)
-                      }
-                      className="glass-input auth-input profile-edit-input"
-                      placeholder="Year"
-                    />
-                    <input
-                      type="url"
-                      value={item.url || ""}
-                      onChange={(e) =>
-                        handleCertificationChange(item.id, "url", e.target.value)
-                      }
-                      className="glass-input auth-input profile-edit-input"
-                      placeholder="Certification URL (optional)"
-                    />
-                  </div>
-                ) : (
-                  <>
-                    <h3 className="profile-item-title">{item.name}</h3>
-                    <p className="profile-item-subtitle">
-                      {item.issuer} • {item.year}
-                    </p>
-                    {item.url && (
-                      <a
-                        href={item.url}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="profile-cert-link"
-                      >
-                        View certificate
-                      </a>
-                    )}
-                  </>
-                )}
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section className="profile-section glass">
-          <div className="profile-section-header">
-            <h2 className="profile-section-title">Skills</h2>
-            {isEditing && (
-              <button className="profile-add-button" onClick={addSkill} type="button">
-                + Add Skill
-              </button>
-            )}
-          </div>
-
-          {isEditing ? (
-            <div className="profile-skills-edit">
-              {profile.skills.map((skill, index) => (
-                <div key={index} className="profile-skill-edit-row">
-                  <input
-                    type="text"
-                    value={skill}
-                    onChange={(e) => handleSkillChange(index, e.target.value)}
-                    className="glass-input auth-input"
-                    placeholder="Skill"
-                  />
                   <button
-                    className="profile-icon-button"
-                    onClick={() => removeSkill(index)}
-                    type="button"
-                    title="Delete skill"
+                    className="profile-remove-button"
+                    onClick={() =>
+                      handleDeleteSkill(
+                        skill.id
+                      )
+                    }
                   >
-                    <TrashIcon />
+                    Remove
                   </button>
                 </div>
               ))}
             </div>
-          ) : (
-            <div className="profile-skills">
-              {profile.skills.map((skill, index) => (
-                <span key={index} className="profile-skill-badge">
-                  {skill}
-                </span>
-              ))}
+
+            <div
+              style={{
+                marginTop: "20px",
+              }}
+            >
+              <input
+                type="text"
+                className="auth-input glass-input"
+                placeholder="New Skill"
+                value={newSkill}
+                onChange={(e) =>
+                  setNewSkill(
+                    e.target.value
+                  )
+                }
+              />
+
+              <button
+                className="btn-primary auth-button"
+                onClick={
+                  handleAddSkill
+                }
+              >
+                Add Skill
+              </button>
             </div>
-          )}
-        </section>
+          </section>
+
+          {/* EXPERIENCE */}
+
+          <section className="profile-section glass-strong">
+            <h2 className="profile-section-title">
+              Experience
+            </h2>
+
+            {experiences.map((experience) => (
+              <div
+                key={experience.id}
+                className="profile-item"
+              >
+                <h3>
+                  {experience.title}
+                </h3>
+
+                <p>
+                  {experience.company}
+                </p>
+
+                <p>
+                  {
+                    experience.description
+                  }
+                </p>
+
+                <button
+                  className="profile-remove-button"
+                  onClick={() =>
+                    handleDeleteExperience(
+                      experience.id
+                    )
+                  }
+                >
+                  Remove
+                </button>
+              </div>
+            ))}
+
+            <div className="profile-list">
+              <input
+                type="text"
+                className="auth-input glass-input"
+                placeholder="Job Title"
+                value={
+                  experienceForm.title
+                }
+                onChange={(e) =>
+                  setExperienceForm({
+                    ...experienceForm,
+                    title:
+                      e.target.value,
+                  })
+                }
+              />
+
+              <input
+                type="text"
+                className="auth-input glass-input"
+                placeholder="Company"
+                value={
+                  experienceForm.company
+                }
+                onChange={(e) =>
+                  setExperienceForm({
+                    ...experienceForm,
+                    company:
+                      e.target.value,
+                  })
+                }
+              />
+
+              <textarea
+                className="auth-input glass-input"
+                placeholder="Description"
+                rows="4"
+                value={
+                  experienceForm.description
+                }
+                onChange={(e) =>
+                  setExperienceForm({
+                    ...experienceForm,
+                    description:
+                      e.target.value,
+                  })
+                }
+              />
+
+              <button
+                className="btn-primary auth-button"
+                onClick={
+                  handleAddExperience
+                }
+              >
+                Add Experience
+              </button>
+            </div>
+          </section>
+
+          {/* EDUCATION */}
+
+          <section className="profile-section glass-strong">
+            <h2 className="profile-section-title">
+              Education
+            </h2>
+
+            {educations.map((education) => (
+              <div
+                key={education.id}
+                className="profile-item"
+              >
+                <h3>
+                  {education.school}
+                </h3>
+
+                <p>
+                  {education.degree}
+                </p>
+
+                <button
+                  className="profile-remove-button"
+                  onClick={() =>
+                    handleDeleteEducation(
+                      education.id
+                    )
+                  }
+                >
+                  Remove
+                </button>
+              </div>
+            ))}
+
+            <div className="profile-list">
+              <input
+                type="text"
+                className="auth-input glass-input"
+                placeholder="School"
+                value={
+                  educationForm.school
+                }
+                onChange={(e) =>
+                  setEducationForm({
+                    ...educationForm,
+                    school:
+                      e.target.value,
+                  })
+                }
+              />
+
+              <input
+                type="text"
+                className="auth-input glass-input"
+                placeholder="Degree"
+                value={
+                  educationForm.degree
+                }
+                onChange={(e) =>
+                  setEducationForm({
+                    ...educationForm,
+                    degree:
+                      e.target.value,
+                  })
+                }
+              />
+
+              <button
+                className="btn-primary auth-button"
+                onClick={
+                  handleAddEducation
+                }
+              >
+                Add Education
+              </button>
+            </div>
+          </section>
+        </div>
       </div>
-    </div>
+    </>
   )
 }
 

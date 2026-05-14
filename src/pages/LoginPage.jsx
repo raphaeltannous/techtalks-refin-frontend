@@ -2,6 +2,7 @@ import { useState } from "react"
 import { useNavigate, Link } from "react-router-dom"
 import { setToken } from "../utils/auth"
 import { loginUser } from "../services/authService"
+import API from "../services/api"
 import Navbar from "../components/Navbar"
 
 function LoginPage() {
@@ -12,22 +13,29 @@ function LoginPage() {
   const navigate = useNavigate()
 
 
-  const handleSubmit = async (e) => {
+const handleSubmit = async (e) => {
   e.preventDefault()
 
+  setError("")
+  setLoading(true)
+
   try {
-    setError("")
+    const response = await API.post("/auth/login", {
+      username: email,
+      password,
+    })
 
-    const data = await loginUser(email, password)
-
-    localStorage.setItem("token", data.access_token)
+    localStorage.setItem("token", response.data.access_token)
+    localStorage.setItem(
+          "username",
+    response.data.user?.username || email
+                        )
 
     navigate("/jobs")
-  } catch (error) {
-    setError(
-      error.response?.data?.detail ||
-      "Login failed"
-    )
+  } catch (err) {
+    setError("Invalid credentials")
+  } finally {
+    setLoading(false)
   }
 }
 

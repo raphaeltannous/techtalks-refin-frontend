@@ -62,6 +62,10 @@ function Navbar() {
           >
             Profile
           </Link>
+
+          <button onClick={logout}  className="navbar-link">
+              Logout
+          </button>
         </div>
       </div>
     </nav>

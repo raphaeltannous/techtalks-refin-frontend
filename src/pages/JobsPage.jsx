@@ -1,47 +1,42 @@
-import { Link } from "react-router-dom"
+import { useEffect, useState } from "react"
+import { Link, useNavigate } from "react-router-dom"
 import Navbar from "../components/Navbar"
+import API from "../services/api"
 
 function JobsPage() {
-  const jobs = [
-    {
-      id: 1,
-      title: "Frontend Developer Intern",
-      company: "RefIn",
-      location: "Beirut, Lebanon",
-      type: "Internship",
-      salary: "$500 - $800",
-      mode: "Hybrid",
-      description:
-        "Build clean React interfaces, improve user experience, and collaborate with the team on modern frontend features.",
-      skills: ["React", "JavaScript", "UI/UX"],
-    },
+  const [jobs, setJobs] = useState([])
+  const [loading, setLoading] = useState(true)
 
-    {
-      id: 2,
-      title: "Junior Backend Developer",
-      company: "TechBridge",
-      location: "Remote",
-      type: "Full-time",
-      salary: "$1200 - $1800",
-      mode: "Remote",
-      description:
-        "Develop APIs, work with databases, and support backend features using modern server-side technologies.",
-      skills: ["FastAPI", "PostgreSQL", "Python"],
-    },
+  const navigate = useNavigate()
 
-    {
-      id: 3,
-      title: "UI/UX Designer",
-      company: "Creative Labs",
-      location: "Beirut, Lebanon",
-      type: "Part-time",
-      salary: "$700 - $1000",
-      mode: "On-site",
-      description:
-        "Design user-friendly screens, create wireframes, and improve the visual experience of digital products.",
-      skills: ["Figma", "Wireframes", "Design Systems"],
-    },
-  ]
+  useEffect(() => {
+    fetchJobs()
+  }, [])
+
+  const fetchJobs = async () => {
+    try {
+      const response = await API.get("/job/all")
+
+      console.log(response.data)
+
+      setJobs(response.data.data || response.data)
+    } catch (error) {
+      console.log(error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  if (loading) {
+    return (
+      <>
+        <Navbar />
+        <div className="jobs-page">
+          <h1>Loading jobs...</h1>
+        </div>
+      </>
+    )
+  }
 
   return (
     <>
@@ -58,27 +53,30 @@ function JobsPage() {
             <h1>Find the right job for your next step</h1>
 
             <p className="jobs-hero-text">
-              Explore internships, full-time roles, and flexible opportunities
-              designed to help candidates grow their skills and connect with
-              employers.
+              Explore internships, full-time roles, and flexible opportunities.
             </p>
           </section>
 
           <section className="jobs-list">
             {jobs.map((job) => (
-              <article key={job.id} className="jobs-card glass-strong">
+              <article
+                key={job.id}
+                className="jobs-card glass-strong"
+              >
                 <div className="jobs-card-header">
                   <div className="jobs-company-logo">
-                    {job.company.charAt(0)}
+                    {job.company_name?.charAt(0) || "J"}
                   </div>
 
                   <div>
                     <h2>{job.title}</h2>
-                    <p>{job.company}</p>
+                    <p>{job.company_name}</p>
                   </div>
                 </div>
 
-                <p className="jobs-description">{job.description}</p>
+                <p className="jobs-description">
+                  {job.description}
+                </p>
 
                 <div className="jobs-info-grid">
                   <div>
@@ -88,33 +86,22 @@ function JobsPage() {
 
                   <div>
                     <small>Type</small>
-                    <span>{job.type}</span>
-                  </div>
-
-                  <div>
-                    <small>Mode</small>
-                    <span>{job.mode}</span>
+                    <span>{job.job_type}</span>
                   </div>
 
                   <div>
                     <small>Salary</small>
-                    <span>{job.salary}</span>
+                    <span>{job.salary || "Not specified"}</span>
                   </div>
                 </div>
 
-                <div className="jobs-skills">
-                  {job.skills.map((skill) => (
-                    <span key={skill}>{skill}</span>
-                  ))}
-                </div>
-
                 <div className="jobs-card-actions">
-                  <Link
-                    to={`/jobs/${job.id}/apply`}
+                  <button
                     className="btn-primary jobs-apply-button"
+                    onClick={() => navigate(`/apply/${job.id}`)}
                   >
                     Apply Now
-                  </Link>
+                  </button>
 
                   <Link
                     to={`/jobs/${job.id}`}
