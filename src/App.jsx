@@ -1,3 +1,4 @@
+import { useEffect } from "react"
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom"
 
 import LandingPage from "./pages/LandingPage"
@@ -13,17 +14,6 @@ import ApplicationsPage from "./pages/ApplicationsPage"
 import ApplyJobPage from "./pages/ApplyJobPage"
 import PublicProfilePage from "./pages/PublicProfilePage"
 
-useEffect(() => {
-  const checkAuth = async () => {
-    try {
-      await checkLoginStatus()
-    } catch {
-      localStorage.removeItem("token")
-    }
-  }
-
-  checkAuth()
-}, [])
 
 
 function App() {

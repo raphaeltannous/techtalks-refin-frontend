@@ -68,7 +68,7 @@ function ForgotPasswordPage() {
         {/* Form */}
         <form
           className="auth-form"
-          onSubmit={handleForgotPassword}
+          onSubmit={handleSubmit}
         >
 
           {/* Email */}

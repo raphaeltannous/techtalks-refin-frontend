@@ -79,7 +79,7 @@ function ResetPasswordPage() {
         {/* Form */}
         <form
           className="auth-form"
-          onSubmit={handleResetPassword}
+          onSubmit={handleSubmit}
         >
 
           {/* Password */}

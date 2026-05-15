@@ -1,16 +1,16 @@
 import { Link, useLocation } from "react-router-dom"
 
-
-const handleLogout = () => {
-  localStorage.removeItem("token")
-
-  navigate("/login")
-}
-
 function Navbar() {
   const location = useLocation()
 
   const isActive = (path) => location.pathname === path
+
+const logout = () => {
+  localStorage.removeItem("token")
+  localStorage.removeItem("user")
+
+  window.location.href = "/login"
+}
 
   return (
     <nav className="navbar glass">

@@ -13,7 +13,7 @@ function LoginPage() {
   const navigate = useNavigate()
 
 
-const handleSubmit = async (e) => {
+const handleLogin = async (e) => {
   e.preventDefault()
 
   setError("")

@@ -39,10 +39,9 @@ function SignupPage() {
     setError("")
 
     await registerUser({
-      username,
       email,
       password,
-      name,
+      fullName,
     })
 
     navigate("/login")
@@ -169,7 +168,7 @@ function SignupPage() {
           {error && <div className="auth-error">{error}</div>}
 
           <button
-            onClick={handleSignup}
+            onClick={handleSubmit}
             disabled={loading}
             className="btn-primary auth-button"
           >
