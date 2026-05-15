@@ -21,7 +21,8 @@ const handleLogin = async (e) => {
 
   try {
     const response = await API.post("/auth/login", {
-      username: email,
+      username,
+      email,
       password,
     })
 
